@@ -129,3 +129,6 @@ $RECYCLE.BIN/
 .vscode/launch.json
 .vscode/settings.json
 notes.js
+
+## old js file, before rewrite
+oldapp.js
