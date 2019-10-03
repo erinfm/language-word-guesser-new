@@ -14,7 +14,7 @@ const words = {
     { en: "Donkey", fr: "L'âne" },
     { en: "Dove", fr: "La colombe" },
     { en: "Duck", fr: "Le canard" },
-    { en: "Elephant", fr: "Le éléphant" },
+    { en: "Elephant", fr: "L'éléphant" },
     { en: "Ferret", fr: "Le furet" },
     { en: "Fox", fr: "Le renard" },
     { en: "Frog", fr: "La grenouille" },
