@@ -4,6 +4,8 @@ let question_list = "";
 let click_counter = 0;
 let current_score = 0;
 
+let my_interval = "";
+
 // Array to keep track of questions already asked in round, to prevent repeats
 const used_q_indexes = [];
 
@@ -19,6 +21,7 @@ const current_question = document.getElementById("current-question");
 const answer_options = document.querySelectorAll(".answer-option");
 
 const score_display = document.getElementById("score");
+const timer = document.getElementById("timer");
 
 // *****
 // INITIAL/QUIZ OPTION PAGE
@@ -96,6 +99,8 @@ const getQuizQuestions = () => {
   generateQuestion();
 
   showQuizScreen();
+
+  start_timer();
 };
 
 const showQuizScreen = () => {
@@ -152,6 +157,34 @@ const generateQuestion = () => {
       option.textContent = Object.values(incorrect_answer)[0];
     }
   });
+};
+
+const start_timer = () => {
+  const max_ticks = 59;
+  let tick_count = -1;
+  const tick = () => {
+    if (tick_count >= max_ticks) {
+      // Stops the interval
+      clearInterval(my_interval);
+      // End the round
+      stop_quiz();
+      return;
+    }
+    const time_remaining = max_ticks - tick_count;
+    if (time_remaining < 10)
+      timer.textContent = `Time Remaining: 0${time_remaining}`;
+    else timer.textContent = `Time Remaining: ${time_remaining}`;
+
+    tick_count += 1;
+  };
+
+  // Call tick function every second.
+  my_interval = setInterval(tick, 1000);
+};
+
+const stop_timer = () => {
+  clearInterval(my_interval);
+  timer.textContent = `Time Remaining: 60`;
 };
 
 const manageQuizScreenClicks = e => {
