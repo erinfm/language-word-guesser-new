@@ -253,6 +253,9 @@ const resetQuiz = () => {
   current_score = 0;
   score_display.textContent = `Score: ${current_score}`;
 
+  // Reset used question indexes
+  used_q_indexes = [];
+
   // Stop timer
   stopTimer();
 
