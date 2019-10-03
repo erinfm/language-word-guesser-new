@@ -123,8 +123,12 @@ const getRandomQuestionIndex = () => {
 };
 
 const generateQuestion = () => {
-  // First, reset click counter
+  // First, reset click counter and any current classes set on answers
   click_counter = 0;
+  // Reset option classes
+  answer_options.forEach(option => {
+    option.classList.remove("is-success", "is-danger", "correct-answer");
+  });
 
   const index = getRandomQuestionIndex(question_list);
   const question = question_list[index];
@@ -162,7 +166,7 @@ const generateQuestion = () => {
 };
 
 const startTimer = () => {
-  const max_ticks = 59;
+  const max_ticks = 45;
   let tick_count = -1;
 
   const tick = () => {
@@ -201,8 +205,8 @@ const manageQuizScreenClicks = e => {
   // Otherwise, see whether correct or incorrect answer was clicked
 
   if (e.target.classList.contains("correct-answer")) {
-    manageCorrectAnswer(e.target, nextQuestion);
-  } else manageIncorrectAnswer(e.target, nextQuestion);
+    manageCorrectAnswer(e.target, generateQuestion);
+  } else manageIncorrectAnswer(e.target, generateQuestion);
 };
 
 const manageCorrectAnswer = (element, callback) => {
@@ -214,9 +218,6 @@ const manageCorrectAnswer = (element, callback) => {
   score_display.textContent = `Score: ${current_score}`;
 
   setTimeout(callback, 900);
-  // incrementScore();
-  // setTimeout(resetOptionClasses, 900);
-  // setTimeout(generateQuestion, 900);
 };
 
 const manageIncorrectAnswer = (element, callback) => {
@@ -234,16 +235,6 @@ const showCorrectAnswer = () => {
       option.classList.add("is-success");
     }
   });
-};
-
-const nextQuestion = () => {
-  // Reset option classes
-  answer_options.forEach(option => {
-    option.classList.remove("is-success", "is-danger", "correct-answer");
-  });
-
-  // Generate next question
-  generateQuestion();
 };
 
 const stopQuiz = () => {
