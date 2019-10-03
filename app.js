@@ -1,6 +1,8 @@
 let language = "";
 let topic = "";
+let question_list = "";
 let click_counter = 0;
+let current_score = 0;
 
 // Array to keep track of questions already asked in round, to prevent repeats
 const used_q_indexes = [];
@@ -9,10 +11,14 @@ const used_q_indexes = [];
 const welcome_screen = document.getElementById("welcome-screen");
 const quiz_screen = document.getElementById("quiz-screen");
 
+const topic_columns = document.getElementById("topic-columns");
+
 const start_btn = document.getElementById("start-btn");
 
 const current_question = document.getElementById("current-question");
 const answer_options = document.querySelectorAll(".answer-option");
+
+const score_display = document.getElementById("score");
 
 // *****
 // INITIAL/QUIZ OPTION PAGE
@@ -50,7 +56,7 @@ const showOnlyChosenLanguage = () => {
 };
 
 const showTopics = () => {
-  document.getElementById("topic-columns").classList.toggle("is-hidden");
+  topic_columns.classList.toggle("is-hidden");
 };
 
 const setTopic = element => {
@@ -64,7 +70,7 @@ const setTopic = element => {
 };
 
 const showOnlyChosenTopic = () => {
-  document.getElementById("topic-columns").innerHTML = ` 
+  topic_columns.innerHTML = ` 
   <div class="column topic-option"> 
   <a class="button topic-btn is-info is-medium is-fullwidth is-static">
   ${topic} ✔ 
@@ -85,10 +91,10 @@ const showStartBtn = () => {
 const getQuizQuestions = () => {
   const chosen_combination = `${language}_${topic}`.toLowerCase();
 
-  const question_list = words[chosen_combination];
+  question_list = words[chosen_combination];
 
-  generateQuestion(question_list);
-  console.log(question_list);
+  generateQuestion();
+
   showQuizScreen();
 };
 
@@ -97,7 +103,7 @@ const showQuizScreen = () => {
   quiz_screen.classList.toggle("is-hidden");
 };
 
-const getRandomQuestionIndex = question_list => {
+const getRandomQuestionIndex = () => {
   // Choose a word pair from topic array, check that it has not been used already during the round, and display the target word on screen
   const index = Math.floor(Math.random() * question_list.length);
 
@@ -109,8 +115,10 @@ const getRandomQuestionIndex = question_list => {
   return index;
 };
 
-const generateQuestion = question_list => {
+const generateQuestion = () => {
+  // First, reset click counter
   click_counter = 0;
+
   const index = getRandomQuestionIndex(question_list);
   const question = question_list[index];
 
@@ -146,13 +154,69 @@ const generateQuestion = question_list => {
   });
 };
 
-
 const manageQuizScreenClicks = e => {
-  console.log(e.target)
-if (e.target.)
+  // Prevent multiple rapid clicks. This stops multiple answers from being chosen
+  console.log(e.target);
+  if (!e.target.classList.contains("answer-option")) return;
 
-}
+  click_counter += 1;
 
+  if (click_counter !== 1) return;
+
+  // Otherwise, see whether correct or incorrect answer was clicked
+
+  if (e.target.classList.contains("correct-answer")) {
+    manageCorrectAnswer(e.target, nextQuestion);
+  } else manageIncorrectAnswer(e.target, nextQuestion);
+};
+
+const manageCorrectAnswer = (element, callback) => {
+  console.log(element);
+
+  // Turn element green
+  element.classList.add("is-success");
+
+  // Increment score
+  current_score += 1;
+  score_display.textContent = `Score: ${current_score}`;
+
+  setTimeout(callback, 900);
+  // incrementScore();
+  // setTimeout(resetOptionClasses, 900);
+  // setTimeout(generateQuestion, 900);
+};
+
+const manageIncorrectAnswer = (element, callback) => {
+  console.log(element);
+
+  // Turn element red
+  element.classList.add("is-danger");
+
+  showCorrectAnswer();
+
+  setTimeout(callback, 900);
+
+  // setTimeout(resetOptionClasses, 900);
+  // setTimeout(generateQuestion, 900);
+};
+
+const showCorrectAnswer = () => {
+  answer_options.forEach(option => {
+    if (option.classList.contains("correct-answer")) {
+      option.classList.add("is-success");
+    }
+  });
+};
+
+const nextQuestion = () => {
+  // Reset option classes
+  answer_options.forEach(option => {
+    option.classList.remove("is-success", "is-danger", "correct-answer");
+  });
+
+  // Generate next question
+  generateQuestion();
+};
 
 // ******
 // EVENT LISTENERS
