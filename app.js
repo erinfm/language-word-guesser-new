@@ -12,13 +12,18 @@ const used_q_indexes = [];
 // Variables for quiz display sections
 const welcome_screen = document.getElementById("welcome-screen");
 const quiz_screen = document.getElementById("quiz-screen");
+const final_score_screen = document.getElementById("final-score-screen");
 
+const language_options = document.querySelectorAll(".lang-option");
+const topic_options = document.querySelectorAll(".topic-option");
 const topic_columns = document.getElementById("topic-columns");
 
 const start_btn = document.getElementById("start-btn");
 
 const current_question = document.getElementById("current-question");
 const answer_options = document.querySelectorAll(".answer-option");
+
+const reset_btns = document.querySelectorAll(".reset-btn");
 
 const score_display = document.getElementById("score");
 const timer = document.getElementById("timer");
@@ -29,10 +34,12 @@ const timer = document.getElementById("timer");
 
 const manageQuizSetupOptions = e => {
   // If a language option was clicked, toggle the language and show vocab options
-  if (e.target.classList.contains("lang-btn")) setLanguage(e.target);
+  if (e.target.classList.contains("lang-btn") && language === "")
+    setLanguage(e.target);
 
   // If a topic was clicked, toggle the topic and show start button
-  if (e.target.classList.contains("topic-btn")) setTopic(e.target);
+  if (e.target.classList.contains("topic-btn") && topic === "")
+    setTopic(e.target);
 
   // If start button clicked, start quiz
   if (e.target.classList.contains("start-btn")) getQuizQuestions();
@@ -45,20 +52,18 @@ const setLanguage = element => {
   // Display only chosen language
   showOnlyChosenLanguage();
   // Show topics
-  showTopics();
+  toggleTopics();
 };
 
 const showOnlyChosenLanguage = () => {
-  document.getElementById("language-columns").innerHTML = ` 
-  <div class="column lang-option"> 
-  <a class="button lang-btn is-primary is-medium is-fullwidth is-static">
-  ${language} ✔ 
-  </a>
-  </div>
-  `;
+  language_options.forEach(option => {
+    if (option.innerText !== language) {
+      option.classList.toggle("is-hidden");
+    }
+  });
 };
 
-const showTopics = () => {
+const toggleTopics = () => {
   topic_columns.classList.toggle("is-hidden");
 };
 
@@ -69,22 +74,19 @@ const setTopic = element => {
   // Display only chosen topic
   showOnlyChosenTopic();
   // Show start button
-  showStartBtn();
+  toggleStartBtn();
 };
 
 const showOnlyChosenTopic = () => {
-  topic_columns.innerHTML = ` 
-  <div class="column topic-option"> 
-  <a class="button topic-btn is-info is-medium is-fullwidth is-static">
-  ${topic} ✔ 
-  </a>
-  </div>
-  `;
+  topic_options.forEach(option => {
+    if (option.innerText !== topic) {
+      option.classList.toggle("is-hidden");
+    }
+  });
 };
 
-const showStartBtn = () => {
+const toggleStartBtn = () => {
   start_btn.classList.toggle("is-hidden");
-  start_btn.focus();
 };
 
 // *****
@@ -100,7 +102,7 @@ const getQuizQuestions = () => {
 
   showQuizScreen();
 
-  start_timer();
+  startTimer();
 };
 
 const showQuizScreen = () => {
@@ -159,15 +161,16 @@ const generateQuestion = () => {
   });
 };
 
-const start_timer = () => {
+const startTimer = () => {
   const max_ticks = 59;
   let tick_count = -1;
+
   const tick = () => {
     if (tick_count >= max_ticks) {
       // Stops the interval
       clearInterval(my_interval);
       // End the round
-      stop_quiz();
+      stopQuiz();
       return;
     }
     const time_remaining = max_ticks - tick_count;
@@ -182,14 +185,13 @@ const start_timer = () => {
   my_interval = setInterval(tick, 1000);
 };
 
-const stop_timer = () => {
+const stopTimer = () => {
   clearInterval(my_interval);
   timer.textContent = `Time Remaining: 60`;
 };
 
 const manageQuizScreenClicks = e => {
   // Prevent multiple rapid clicks. This stops multiple answers from being chosen
-  console.log(e.target);
   if (!e.target.classList.contains("answer-option")) return;
 
   click_counter += 1;
@@ -204,8 +206,6 @@ const manageQuizScreenClicks = e => {
 };
 
 const manageCorrectAnswer = (element, callback) => {
-  console.log(element);
-
   // Turn element green
   element.classList.add("is-success");
 
@@ -220,17 +220,12 @@ const manageCorrectAnswer = (element, callback) => {
 };
 
 const manageIncorrectAnswer = (element, callback) => {
-  console.log(element);
-
   // Turn element red
   element.classList.add("is-danger");
 
   showCorrectAnswer();
 
   setTimeout(callback, 900);
-
-  // setTimeout(resetOptionClasses, 900);
-  // setTimeout(generateQuestion, 900);
 };
 
 const showCorrectAnswer = () => {
@@ -251,8 +246,48 @@ const nextQuestion = () => {
   generateQuestion();
 };
 
+const stopQuiz = () => {
+  // Display user's score
+  document.getElementById(
+    "final-score"
+  ).textContent = `Your score: ${current_score}`;
+
+  // Togle score screen
+  quiz_screen.classList.toggle("is-hidden");
+  final_score_screen.classList.toggle("is-hidden");
+};
+
+const resetQuiz = () => {
+  // Reset score
+  current_score = 0;
+  score_display.textContent = `Score: ${current_score}`;
+
+  // Stop timer
+  stopTimer();
+
+  // Reset chosen language/topic combination
+  language = "";
+  topic = "";
+
+  // Reset welcome screen setup options
+  language_options.forEach(option => option.classList.remove("is-hidden"));
+  topic_options.forEach(option => option.classList.remove("is-hidden"));
+  toggleTopics();
+  toggleStartBtn();
+
+  // Back to welcome screen
+  returnToWelcomeScreen();
+};
+
+const returnToWelcomeScreen = () => {
+  final_score_screen.classList.add("is-hidden");
+  quiz_screen.classList.add("is-hidden");
+  welcome_screen.classList.remove("is-hidden");
+};
+
 // ******
 // EVENT LISTENERS
 // ******
 welcome_screen.addEventListener("click", manageQuizSetupOptions);
 quiz_screen.addEventListener("click", manageQuizScreenClicks);
+reset_btns.forEach(btn => btn.addEventListener("click", resetQuiz));
