@@ -166,7 +166,7 @@ const generateQuestion = () => {
 };
 
 const startTimer = () => {
-  const max_ticks = 45;
+  const max_ticks = 59;
   let tick_count = -1;
 
   const tick = () => {
