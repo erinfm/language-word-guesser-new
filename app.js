@@ -1,5 +1,15 @@
 let language = "";
 let topic = "";
+let click_counter = 0;
+
+// Array to keep track of questions already asked in round, to prevent repeats
+const used_q_indexes = [];
+
+// Variables for quiz display sections
+const welcome_screen = document.getElementById("welcome-screen");
+const quiz_screen = document.getElementById("quiz-screen");
+
+const start_btn = document.getElementById("start-btn");
 
 // *****
 // INITIAL/QUIZ OPTION PAGE
@@ -13,7 +23,7 @@ const manageQuizOptions = e => {
   if (e.target.classList.contains("topic-btn")) setTopic(e.target);
 
   // If start button clicked, start quiz
-  if (e.target.classList.contains("start-btn")) startQuiz();
+  if (e.target.classList.contains("start-btn")) getQuizQuestions();
 };
 
 const setLanguage = element => {
@@ -61,15 +71,53 @@ const showOnlyChosenTopic = () => {
 };
 
 const showStartBtn = () => {
-  document.getElementById("start-btn").classList.toggle("is-hidden");
-  startBtn.focus();
+  start_btn.classList.toggle("is-hidden");
+  start_btn.focus();
 };
 
 // *****
 // QUIZ IN PROGRESS PAGE
 // *****
 
+const getQuizQuestions = () => {
+  const chosen_combination = `${language}_${topic}`.toLowerCase();
+
+  const question_list = words[chosen_combination];
+  console.log(question_list);
+  showQuizScreen();
+};
+
+const showQuizScreen = () => {
+  welcome_screen.classList.toggle("is-hidden");
+  quiz_screen.classList.toggle("is-hidden");
+};
+
+const getRandomQuestionIndex = () => {
+  // Choose a word pair from topic array, check that it has not been used already during the round, and display the target word on screen
+  const index = Math.floor(Math.random() * question_list.length);
+
+  // Repeat function to choose another value if chosen value has already been used
+  if (used_q_indexes.includes(index)) return getRandomQuestionIndex();
+
+  // Add question index to array so it is not used again during round
+  used_q_indexes.push(index);
+  return index;
+};
+
+// const generateQuestion = () => {
+//   click_counter = 0;
+//   const randomIndex = getRandomIndex();
+//   const chosenQuestion = langTopicCombination[randomIndex];
+
+//   correctAnswer = Object.values(chosenQuestion)[0];
+//   currentQuestion.textContent = Object.values(chosenQuestion)[1];
+
+//   // Choose one of the three answer columns at random and display correct answer inside
+//   const correctAnswerColumn = document.getElementById(
+//     `a-column-${Math.floor(Math.random() * 3)}`
+//   );
+//   correctAnswerColumn.classList.add('correct-answer');
+//   correctAnswerColumn.textContent = correctAnswer;
+
 // EVENT LISTENERS
-document
-  .getElementById("welcome-screen")
-  .addEventListener("click", manageQuizOptions);
+welcome_screen.addEventListener("click", manageQuizOptions);
