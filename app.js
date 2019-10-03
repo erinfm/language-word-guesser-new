@@ -7,7 +7,7 @@ let current_score = 0;
 let my_interval = "";
 
 // Array to keep track of questions already asked in round, to prevent repeats
-const used_q_indexes = [];
+let used_q_indexes = [];
 
 // Variables for quiz display sections
 const welcome_screen = document.getElementById("welcome-screen");
